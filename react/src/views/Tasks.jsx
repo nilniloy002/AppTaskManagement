@@ -1,85 +1,120 @@
-import {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import axiosClient from "../axios-client.js";
-import {Link} from "react-router-dom";
-import {useStateContext} from "../context/ContextProvider.jsx";
+import { Link } from "react-router-dom";
 
-export default function Users() {
-  const [users, setUsers] = useState([]);
+export default function Tasks() {
+  const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
-  const {setNotification} = useStateContext()
+  const [selectedStatus, setSelectedStatus] = useState("All");
 
   useEffect(() => {
-    getUsers();
-  }, [])
+    getTasks();
+  }, []);
 
-  const onDeleteClick = user => {
-    if (!window.confirm("Are you sure you want to delete this user?")) {
-      return
+  const onDeleteClick = (task) => {
+    if (!window.confirm("Are you sure you want to delete this task?")) {
+      return;
     }
-    axiosClient.delete(`/users/${user.id}`)
-      .then(() => {
-        setNotification('User was successfully deleted')
-        getUsers()
-      })
-  }
+    axiosClient.delete(`/tasks/${task.id}`).then(() => {
+      getTasks();
+    });
+  };
 
-  const getUsers = () => {
-    setLoading(true)
-    axiosClient.get('/users')
+  const getTasks = () => {
+    setLoading(true);
+    axiosClient
+      .get("/tasks")
       .then(({ data }) => {
-        setLoading(false)
-        setUsers(data.data)
+        setLoading(false);
+        setTasks(data.data);
       })
       .catch(() => {
-        setLoading(false)
-      })
-  }
+        setLoading(false);
+      });
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "To Do":
+        return "blue";
+      case "In Progress":
+        return "orange";
+      case "Completed":
+        return "green";
+      default:
+        return "black"; // Default color
+    }
+  };
+
+  const filteredTasks =
+    selectedStatus === "All" ? tasks : tasks.filter((task) => task.status === selectedStatus);
 
   return (
     <div>
-      <div style={{display: 'flex', justifyContent: "space-between", alignItems: "center"}}>
-        <h1>Users</h1>
-        <Link className="btn-add" to="/users/new">Add new</Link>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h1>Tasks</h1>
+        <div style={{ display: "flex", alignItems: "initial",fontWeight:"bold" }}>
+          <label htmlFor="statusFilter" style={{ marginRight: "10px" }}>
+            Filter by status:
+          </label>
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+          >
+            <option value="All">All</option>
+            <option value="To Do">To Do</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+        <Link className="btn-add" to="/tasks/new">
+          Add new
+        </Link>
       </div>
       <div className="card animated fadeInDown">
         <table>
           <thead>
           <tr>
             <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Create Date</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Due Date</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
           </thead>
-          {loading &&
-            <tbody>
+          <tbody>
+          {loading ? (
             <tr>
-              <td colSpan="5" class="text-center">
+              <td colSpan="6" className="text-center">
                 Loading...
               </td>
             </tr>
-            </tbody>
-          }
-          {!loading &&
-            <tbody>
-            {users.map(u => (
-              <tr key={u.id}>
-                <td>{u.id}</td>
-                <td>{u.name}</td>
-                <td>{u.email}</td>
-                <td>{u.created_at}</td>
+          ) : (
+            filteredTasks.map((task) => (
+              <tr key={task.id}>
+                <td>{task.id}</td>
+                <td>{task.title}</td>
+                <td>{task.description}</td>
+                <td>{task.due_date}</td>
+                <td style={{ color: getStatusColor(task.status) }}>
+                  {task.status}
+                </td>
                 <td>
-                  <Link className="btn-edit" to={'/users/' + u.id}>Edit</Link>
+                  <Link className="btn-edit" to={"/tasks/" + task.id}>
+                    Edit
+                  </Link>
                   &nbsp;
-                  <button className="btn-delete" onClick={ev => onDeleteClick(u)}>Delete</button>
+                  <button className="btn-delete" onClick={(ev) => onDeleteClick(task)}>
+                    Delete
+                  </button>
                 </td>
               </tr>
-            ))}
-            </tbody>
-          }
+            ))
+          )}
+          </tbody>
         </table>
       </div>
     </div>
-  )
+  );
 }

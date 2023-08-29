@@ -107,7 +107,7 @@ table > thead > tr > th {
 table > tbody > tr > td {
     padding: 0.5rem 0.5rem;
     border-bottom: 1px solid #efefef;
-    white-space: nowrap;
+    white-space: pre-wrap;
 }
 
 .card {
@@ -138,6 +138,17 @@ table > tbody > tr > td {
     border-radius: 0.5rem;
 }
 
+textarea,select {
+    outline: 0;
+    background: #ffffff;
+    width: 100%;
+    border: 2px solid #e6e6e6;
+    margin: 0 0 15px;
+    padding: 15px;
+    box-sizing: border-box;
+    font-size: 14px;
+    transition: all 0.3s;
+}
 /* Login/Signup forms*/
 
 .login-signup-form {
