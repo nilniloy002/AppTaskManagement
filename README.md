@@ -3,7 +3,7 @@
 ## Installation 
 Make sure you have the environment set up properly. You will need PHP8.1, composer, and Node.js.
 
-1. Download the project (or clone using GIT)
+1. Download the project (or clone using GIT)/ git clone https://github.com/nilniloy002/AppTaskManagement.git
 2. Copy `.env.example` into `.env` and configure database credentials
 3. Navigate to the project's root directory using terminal
 4. Run `composer install`
